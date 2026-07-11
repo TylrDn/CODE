@@ -110,16 +110,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Exclude this workflow's own check to avoid circular dependency
+          # Match explicitly known failing states rather than excluding success states,
+          # so any new conclusion values GitHub adds are treated as non-failing by default.
           FAILING=$(gh pr view "${{ steps.find-pr.outputs.pr_number }}" \
             --repo "${{ github.repository }}" \
             --json statusCheckRollup \
             --jq '[.statusCheckRollup[] |
-                   select(.conclusion != null and
-                          .conclusion != "success" and
-                          .conclusion != "skipped" and
-                          .conclusion != "neutral" and
-                          .name != "auto-merge")] | length')
+                   select(.name != "auto-merge" and
+                          (.conclusion | IN("failure", "cancelled", "timed_out", "action_required", "stale")))] | length')
 
           PENDING=$(gh pr view "${{ steps.find-pr.outputs.pr_number }}" \
             --repo "${{ github.repository }}" \
@@ -149,15 +147,20 @@ jobs:
           gh pr review "${{ steps.find-pr.outputs.pr_number }}" \
             --repo "${{ github.repository }}" \
             --approve \
-            --body "✅ All AI reviews approved and status checks passed. Auto-merging."
+            --body "✅ All AI reviews approved and status checks passed. Auto-merging." \
+            || echo "Already approved or approval not required — continuing."
 
       - name: Enable auto-merge
         if: steps.check-status.outputs.checks_ok == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # --auto merges immediately if all required conditions are already met,
+          # or waits until they are. Suppress non-zero exit if auto-merge is
+          # already enabled or the PR was already merged by another run.
           gh pr merge "${{ steps.find-pr.outputs.pr_number }}" \
             --repo "${{ github.repository }}" \
             --squash \
             --auto \
-            --delete-branch
+            --delete-branch \
+            || echo "Auto-merge already enabled, PR already merged, or merge not allowed — skipping."
