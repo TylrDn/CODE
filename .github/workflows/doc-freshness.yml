@@ -6,6 +6,9 @@ on:
     - cron: "0 9 * * 1"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   check-freshness:
     name: Flag stale agent docs
@@ -28,7 +31,13 @@ jobs:
               continue
             fi
 
-            REVIEWED_TS=$(date -u -d "$REVIEWED" +%s 2>/dev/null || date -u -j -f "%Y-%m-%d" "$REVIEWED" +%s 2>/dev/null || echo 0)
+            # Parse date with GNU date; skip the file if parsing fails
+            if ! REVIEWED_TS=$(date -u -d "$REVIEWED" +%s 2>/dev/null); then
+              echo "::warning file=$FILE::Could not parse last_reviewed date '$REVIEWED' in $FILE — skipping"
+              STALE=1
+              continue
+            fi
+
             DAYS_OLD=$(( (TODAY - REVIEWED_TS) / 86400 ))
 
             if [[ "$DAYS_OLD" -gt "$STALE_DAYS" ]]; then

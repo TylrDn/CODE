@@ -110,4 +110,4 @@ After any agent-driven session, create a log entry in `session-log/` with the fi
 YYYY-MM-DD-<short-slug>.md
 ```
 
-Example: `session-log/2025-07-11-add-auth-flow.md`
+Example: `session-log/2026-07-11-add-auth-flow.md`

@@ -5,6 +5,9 @@ on:
     paths:
       - "agent/**"
 
+permissions:
+  contents: read
+
 jobs:
   session-log-check:
     name: Check session-log entry exists

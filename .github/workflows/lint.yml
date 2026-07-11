@@ -6,6 +6,9 @@ on:
       - "bootstrap.sh"
       - ".github/workflows/lint.yml"
 
+permissions:
+  contents: read
+
 jobs:
   shellcheck:
     name: ShellCheck bootstrap.sh

@@ -47,7 +47,7 @@ Multi-part session focused on two goals:
 ## Next Steps
 
 - [ ] Merge this PR to `main`
-- [ ] Create `TylrDn/mobile-forge` repo and run `bash bootstrap.sh TylrDn/mobile-forge` as the first real-world test
+- [ ] Create `TylrDn/mobile-forge` repo and run `bash bootstrap.sh TylrDn/mobile-forge --register` as the first real-world test
 - [ ] Create `TylrDn/dev-kit` repo and scaffold it
 - [ ] Update repo-index status for `mobile-forge` and `dev-kit` from `planned` → `active` once created
 - [ ] Consider escalating `validate-docs.yml` to a hard fail after the workflow is proven

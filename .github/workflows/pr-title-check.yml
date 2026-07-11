@@ -4,6 +4,8 @@ on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
 
+permissions: {}
+
 jobs:
   conventional-commits:
     name: Validate PR title
