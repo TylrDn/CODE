@@ -1,0 +1,33 @@
+name: Auto Session Log
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  log:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Write session log
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          BRANCH="${{ github.event.pull_request.head.ref }}"
+          FILE="session-log/${DATE}-${BRANCH}.md"
+          mkdir -p session-log
+          echo "# Session: ${BRANCH}" > $FILE
+          echo "**Date:** ${DATE}" >> $FILE
+          echo "**PR:** #${{ github.event.pull_request.number }}" >> $FILE
+          echo "**Title:** ${{ github.event.pull_request.title }}" >> $FILE
+          echo "" >> $FILE
+          echo "## Commits" >> $FILE
+          git log origin/main..HEAD --oneline >> $FILE || echo "(none)" >> $FILE
+      - name: Commit log
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add session-log/
+          git commit -m "chore: auto session log for ${{ github.event.pull_request.head.ref }}" || echo "Nothing to commit"
+          git push
