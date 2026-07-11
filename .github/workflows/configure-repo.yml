@@ -1,0 +1,113 @@
+name: Configure Repository (one-shot)
+
+# Run this ONCE manually to:
+#   1. Configure ruleset 18796707 (main-protection) with correct settings
+#   2. Enable auto-merge and squash-only merges on the repo
+#
+# After a successful run you can delete this file.
+#
+# Required: a repository secret named ADMIN_TOKEN containing a classic PAT
+# with scopes: repo (full) + admin:repo_hook
+# Without an admin token the ruleset and repo-settings API calls will 403.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  configure:
+    name: Apply repository settings
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure ruleset 18796707 (main-protection)
+        env:
+          GH_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+        run: |
+          gh api \
+            --method PUT \
+            /repos/TylrDn/CODE/rulesets/18796707 \
+            --input - <<'JSON'
+          {
+            "name": "main-protection",
+            "enforcement": "active",
+            "bypass_actors": [
+              {
+                "actor_id": 2,
+                "actor_type": "Integration",
+                "bypass_mode": "always"
+              }
+            ],
+            "conditions": {
+              "ref_name": {
+                "include": ["refs/heads/main"],
+                "exclude": []
+              }
+            },
+            "rules": [
+              {
+                "type": "pull_request",
+                "parameters": {
+                  "required_approving_review_count": 1,
+                  "dismiss_stale_reviews_on_push": true,
+                  "require_code_owner_review": false,
+                  "require_last_push_approval": false,
+                  "required_review_thread_resolution": false
+                }
+              },
+              {
+                "type": "required_status_checks",
+                "parameters": {
+                  "strict_required_status_checks_policy": false,
+                  "required_status_checks": []
+                }
+              },
+              {
+                "type": "non_fast_forward"
+              }
+            ]
+          }
+          JSON
+
+          echo "✅ Ruleset updated."
+
+      - name: Enable auto-merge and squash-only on repo
+        env:
+          GH_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+        run: |
+          gh api \
+            --method PATCH \
+            /repos/TylrDn/CODE \
+            --input - <<'JSON'
+          {
+            "allow_auto_merge": true,
+            "delete_branch_on_merge": true,
+            "allow_squash_merge": true,
+            "allow_merge_commit": false,
+            "allow_rebase_merge": false,
+            "squash_merge_commit_title": "PR_TITLE",
+            "squash_merge_commit_message": "PR_BODY"
+          }
+          JSON
+
+          echo "✅ Repo settings updated."
+
+      - name: Summary
+        run: |
+          echo "### ✅ Repository configured" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Setting | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Ruleset target | \`main\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Bypass | GitHub Actions app |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Required approvals | 1 |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Dismiss stale reviews | ✅ |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Require status checks | ✅ |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Block force pushes | ✅ |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Auto-merge | ✅ enabled |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Merge method | Squash only |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Delete branch on merge | ✅ |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "> You can now delete \`.github/workflows/configure-repo.yml\`" >> "$GITHUB_STEP_SUMMARY"
