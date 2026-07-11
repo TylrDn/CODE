@@ -5,7 +5,7 @@
 | Date      | 2026-07-11                                       |
 | Agent     | GitHub Copilot Coding Agent                      |
 | Branch    | `chore/wire-repo-integration`                    |
-| Trigger   | Manual prompt — repos created, wire integration  |
+| Trigger   | Manual prompt — repos created, wire integration |
 
 ## Summary
 

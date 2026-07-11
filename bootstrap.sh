@@ -85,12 +85,12 @@ echo "✓ Written: $DEST_FILE"
 if [[ "$REGISTER" -eq 1 ]]; then
   if [[ ! -f "$REPO_INDEX" ]]; then
     echo "⚠  --register: repo-index/README.md not found at $REPO_INDEX. Skipping." >&2
-  elif grep -qF "$REPO_NAME" "$REPO_INDEX" || grep -qF "$REPO_SLUG" "$REPO_INDEX"; then
+  elif grep -qF "[$REPO_NAME]" "$REPO_INDEX" || grep -qF "| $REPO_SLUG " "$REPO_INDEX"; then
     echo "ℹ  --register: $REPO_NAME already exists in repo-index/README.md. Skipping."
   else
     # Append a new row to the table — format matches existing repo-index/README.md
     TODAY=$(date -u +%Y-%m-%d)
-    NEW_ROW="| [$REPO_NAME](https://github.com/$REPO_NAME) | planned | — | — | Added via bootstrap.sh on $TODAY |"
+    NEW_ROW="| [$REPO_NAME](https://github.com/$REPO_NAME) | planned | pending | TBD | Added via bootstrap.sh on $TODAY |"
     # Insert before the last blank line or at the end of the table
     echo "$NEW_ROW" >> "$REPO_INDEX"
     echo "✓ Registered $REPO_NAME in repo-index/README.md"
