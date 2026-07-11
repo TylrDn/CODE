@@ -26,7 +26,7 @@ fi
 REPO_NAME="$1"                              # e.g. TylrDn/mobile-forge
 REPO_SLUG="${REPO_NAME##*/}"                # e.g. mobile-forge
 TARGET_DIR="${2:-$(pwd)/$REPO_SLUG}"        # default: ./<repo-slug>
-DEST="$TARGET_DIR/.github/copilot-instructions.md"
+DEST_FILE="$TARGET_DIR/.github/copilot-instructions.md"
 
 # ── Fetch template ───────────────────────────────────────────────────────────
 
@@ -43,17 +43,17 @@ OUTPUT="${TEMPLATE_CONTENT//\{\{REPO_NAME\}\}/$REPO_NAME}"
 
 # Strip the usage comment block (lines between <!-- and --> at the top)
 OUTPUT="$(echo "$OUTPUT" | awk '
-  /^<!--/{skip=1}
-  !skip{print}
+  /^<!--/{skip=1; next}
   /^-->/{skip=0; next}
+  !skip{print}
 ')"
 
 # ── Write output ─────────────────────────────────────────────────────────────
 
 mkdir -p "$TARGET_DIR/.github"
 
-if [[ -f "$DEST" ]]; then
-  echo "⚠  $DEST already exists. Overwrite? [y/N] " >&2
+if [[ -f "$DEST_FILE" ]]; then
+  echo "⚠  $DEST_FILE already exists. Overwrite? [y/N] " >&2
   read -r REPLY
   if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
     echo "Aborted." >&2
@@ -61,9 +61,9 @@ if [[ -f "$DEST" ]]; then
   fi
 fi
 
-echo "$OUTPUT" > "$DEST"
+echo "$OUTPUT" > "$DEST_FILE"
 
-echo "✓ Written: $DEST"
+echo "✓ Written: $DEST_FILE"
 echo ""
 echo "Next steps:"
 echo "  1. cd $TARGET_DIR"
