@@ -22,8 +22,8 @@ Key facts:
 
 Repos in scope:
 - TylrDn/CODE — active — central governance and documentation
-- TylrDn/mobile-forge — planned — React Native / Expo scaffold template
-- TylrDn/dev-kit — planned — dotfiles, tooling configs, agent workflow standards
+- TylrDn/mobile-forge — active — React Native / Expo scaffold template
+- TylrDn/dev-kit — active — dotfiles, tooling configs, agent workflow standards
 
 Before making changes:
 1. Read repo-index/ to understand the repo's purpose and stack

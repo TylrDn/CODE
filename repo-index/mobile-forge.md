@@ -47,11 +47,11 @@ mobile-forge/
 
 ## Entry Points
 
-- **Repo**: `https://github.com/TylrDn/mobile-forge` _(pending creation)_
+- **Repo**: `https://github.com/TylrDn/mobile-forge`
 - **Bootstrap**: `scripts/bootstrap.sh` — run once to init a new project from this template
 - **CI**: `.github/workflows/ci.yml` — lint + test on every PR
 - **Release**: `.github/workflows/release.yml` — triggered by semver tag push
 
 ## Status
 
-`planned` — scaffold defined in CODE repo-index; GitHub repo pending creation.
+`active` — repo created; bootstrap from CODE using `bash bootstrap.sh TylrDn/mobile-forge --register`.
