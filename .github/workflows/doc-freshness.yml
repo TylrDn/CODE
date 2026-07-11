@@ -33,7 +33,7 @@ jobs:
 
             # Parse date with GNU date; skip the file if parsing fails
             if ! REVIEWED_TS=$(date -u -d "$REVIEWED" +%s 2>/dev/null); then
-              echo "::warning file=$FILE::Could not parse last_reviewed date '$REVIEWED' in $FILE — skipping"
+              echo "::warning file=$FILE::Could not parse last_reviewed date '$REVIEWED' in $FILE -- skipping"
               STALE=1
               continue
             fi

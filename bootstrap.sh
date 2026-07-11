@@ -85,7 +85,7 @@ echo "✓ Written: $DEST_FILE"
 if [[ "$REGISTER" -eq 1 ]]; then
   if [[ ! -f "$REPO_INDEX" ]]; then
     echo "⚠  --register: repo-index/README.md not found at $REPO_INDEX. Skipping." >&2
-  elif grep -qE "$REPO_NAME|$REPO_SLUG" "$REPO_INDEX"; then
+  elif grep -qF "$REPO_NAME" "$REPO_INDEX" || grep -qF "$REPO_SLUG" "$REPO_INDEX"; then
     echo "ℹ  --register: $REPO_NAME already exists in repo-index/README.md. Skipping."
   else
     # Append a new row to the table — format matches existing repo-index/README.md
