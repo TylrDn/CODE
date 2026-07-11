@@ -27,17 +27,17 @@ jobs:
         id: check-author
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
-          AUTHOR=$(gh pr view "${{ github.event.pull_request.number }}" \
+          AUTHOR=$(gh pr view "$PR_NUMBER" \
             --repo "${{ github.repository }}" \
             --json author \
             --jq '.author.login')
 
-          HEAD_REF="${{ github.event.pull_request.head.ref }}"
-
           echo "Author: $AUTHOR  |  Branch: $HEAD_REF"
 
-          if echo "$AUTHOR" | grep -qiE 'copilot|github-actions'; then
+          if echo "$AUTHOR" | grep -qiE '^(copilot|github-copilot)\[bot\]$'; then
             echo "is_copilot=true" >> "$GITHUB_OUTPUT"
           elif echo "$HEAD_REF" | grep -qiE '^copilot/'; then
             echo "is_copilot=true" >> "$GITHUB_OUTPUT"
@@ -50,21 +50,20 @@ jobs:
         id: collect-feedback
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REVIEW_ID: ${{ github.event.review.id }}
+          REVIEWER: ${{ github.event.review.user.login }}
+          REVIEW_BODY: ${{ github.event.review.body }}
         run: |
-          # Gather reviewer login and the body of the triggering review
-          REVIEWER="${{ github.event.review.user.login }}"
-          BODY="${{ github.event.review.body }}"
-
-          # Collect all open review comments (inline + top-level)
           COMMENTS=$(gh api \
-            "/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews/${{ github.event.review.id }}/comments" \
+            "/repos/${{ github.repository }}/pulls/${PR_NUMBER}/reviews/${REVIEW_ID}/comments" \
             --jq '[.[] | "- \(.path):\(.line // "general") — \(.body)"] | join("\n")' \
             2>/dev/null || echo "")
 
           {
             echo "reviewer=$REVIEWER"
             echo "review_body<<EOF"
-            echo "$BODY"
+            echo "$REVIEW_BODY"
             echo "EOF"
             echo "review_comments<<EOF"
             echo "$COMMENTS"
@@ -75,22 +74,21 @@ jobs:
         if: steps.check-author.outputs.is_copilot == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REVIEWER: ${{ steps.collect-feedback.outputs.reviewer }}
+          REVIEW_BODY: ${{ steps.collect-feedback.outputs.review_body }}
+          COMMENTS: ${{ steps.collect-feedback.outputs.review_comments }}
         run: |
-          REVIEWER="${{ steps.collect-feedback.outputs.reviewer }}"
-          REVIEW_BODY="${{ steps.collect-feedback.outputs.review_body }}"
-          COMMENTS="${{ steps.collect-feedback.outputs.review_comments }}"
-
-          # Build the re-trigger comment
           COMMENT="@github-copilot A review from **${REVIEWER}** has requested changes on this PR. Please address all feedback below and push updated commits.
 
-          **Review summary:**
-          ${REVIEW_BODY}
+**Review summary:**
+${REVIEW_BODY}
 
-          **Inline comments to resolve:**
-          ${COMMENTS:-_No inline comments._}
+**Inline comments to resolve:**
+${COMMENTS:-_No inline comments._}
 
-          Once all issues are fixed, the auto-merge workflow will re-evaluate and merge when all AI reviews pass."
+Once all issues are fixed, the auto-merge workflow will re-evaluate and merge when all AI reviews pass."
 
-          gh pr comment "${{ github.event.pull_request.number }}" \
+          gh pr comment "$PR_NUMBER" \
             --repo "${{ github.repository }}" \
             --body "$COMMENT"

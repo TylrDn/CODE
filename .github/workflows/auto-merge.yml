@@ -67,7 +67,7 @@ jobs:
             --json headRefName \
             --jq '.headRefName')
 
-          if echo "$AUTHOR" | grep -qiE 'copilot|github-actions'; then
+          if echo "$AUTHOR" | grep -qiE '^(copilot|github-copilot)\[bot\]$'; then
             echo "is_copilot=true" >> "$GITHUB_OUTPUT"
           elif echo "$HEAD_REF" | grep -qiE '^copilot/'; then
             echo "is_copilot=true" >> "$GITHUB_OUTPUT"
@@ -116,9 +116,9 @@ jobs:
             --json statusCheckRollup \
             --jq '[.statusCheckRollup[] |
                    select(.conclusion != null and
-                          .conclusion != "SUCCESS" and
-                          .conclusion != "SKIPPED" and
-                          .conclusion != "NEUTRAL" and
+                          .conclusion != "success" and
+                          .conclusion != "skipped" and
+                          .conclusion != "neutral" and
                           .name != "auto-merge")] | length')
 
           PENDING=$(gh pr view "${{ steps.find-pr.outputs.pr_number }}" \
