@@ -53,7 +53,7 @@ OUTPUT="$(echo "$OUTPUT" | awk '
 mkdir -p "$TARGET_DIR/.github"
 
 if [[ -f "$DEST_FILE" ]]; then
-  echo "⚠  $DEST_FILE already exists. Overwrite? [y/N] " >&2
+  echo "⚠  $DEST_FILE already exists. Overwrite? [y/N]" >&2
   read -r REPLY
   if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
     echo "Aborted." >&2
