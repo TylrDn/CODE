@@ -1,29 +1,31 @@
 ---
-name: "🧪 Experiment / Idea"
-about: "New idea to prototype — timeboxed, low-commitment"
-labels: ["experiment"]
-assignees: []
+name: Experiment / New Idea
+about: Exploratory build — prototype or proof of concept
+title: 'feat(<scope>): [EXPERIMENT] <short description>'
+labels: ['experiment', 'copilot']
+assignees: ''
 ---
 
-## Idea
-<!-- One paragraph. What are you trying to learn or build? -->
+## Hypothesis
 
+<!-- What are you trying to learn or prove? -->
 
-## Success Signal
-<!-- How will you know this worked? What does "done" look like? -->
+## Build Spec
 
+<!-- What should the agent actually build? Be concrete. -->
 
-## Timebox
-<!-- How long is this worth? e.g., "2 hours", "one PR" -->
+## Success Criteria
 
+<!-- How will you know the experiment worked? -->
+- [ ] 
+- [ ] 
 
-## Stack
-<!-- New repo, existing repo, or throwaway? What tech? -->
+## Constraints
 
+- **Time-box:** <!-- e.g., keep it under 200 lines, no external APIs -->
+- **Stack:** <!-- language, framework, allowed libraries -->
+- **Out of scope:** <!-- what not to build -->
 
-## If It Works → Next Step
-<!-- What does this become if the experiment succeeds? -->
+## Notes
 
-
-## If It Fails → Learnings
-<!-- What would be useful to document even if this doesn't ship? -->
+<!-- Context, inspiration, reference links -->

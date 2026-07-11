@@ -1,30 +1,39 @@
 ---
-name: "🐛 Bug Report"
-about: "Something broken — structured for agent dispatch"
-labels: ["bug", "copilot"]
-assignees: []
+name: Bug Report
+about: Something broken — structured for agent fix
+title: 'fix(<scope>): <short description>'
+labels: ['bug', 'copilot']
+assignees: ''
 ---
 
-## What's Broken
-<!-- One sentence. What fails, where. -->
+## What's broken
 
+<!-- One sentence describing the failure -->
 
 ## Steps to Reproduce
+
 1. 
 2. 
 3. 
 
-## Expected vs Actual
-- **Expected:** 
-- **Actual:** 
+## Expected Behavior
 
-## Affected Repo & File(s)
-- **Repo:** 
-- **File(s):** 
+<!-- What should happen -->
 
-## Fix Hypothesis
-<!-- Optional: your best guess at root cause or where to look. -->
+## Actual Behavior
 
+<!-- What actually happens -->
+
+## Acceptance Criteria
+
+- [ ] Bug no longer reproducible via steps above
+- [ ] No regressions in related functionality
+- [ ] 
+
+## Context
+
+<!-- Environment, version, relevant logs -->
 
 ## Do Not Touch
-<!-- Files or areas the agent should not modify while fixing this. -->
+
+<!-- Files or areas the agent should leave alone -->

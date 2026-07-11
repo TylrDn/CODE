@@ -1,34 +1,38 @@
 ---
-name: "✨ Feature Spec"
-about: "New feature to build — structured for agent dispatch"
-labels: ["feature", "copilot"]
-assignees: []
+name: Feature Spec
+about: New feature or capability — structured for agent execution
+title: 'feat(<scope>): <short description>'
+labels: ['feature', 'copilot']
+assignees: ''
 ---
 
-## Problem / Goal
-<!-- What problem does this solve? One clear sentence. -->
+## What
 
+<!-- One sentence: what does this feature do? -->
+
+## Why
+
+<!-- Why does this matter? What problem does it solve? -->
 
 ## Acceptance Criteria
-<!-- Bullet list. Each item must be verifiable (testable or visually confirmable). -->
+
+<!-- The agent will use these as a done-checklist. Be specific. -->
 - [ ] 
 - [ ] 
 - [ ] 
+
+## Scope
+
+**In scope:**
+- 
+
+**Out of scope (do not touch):**
+- 
 
 ## Stack / Constraints
-<!-- Language, framework, files in scope. What NOT to touch. -->
-- **Repo:** 
-- **Stack:** 
-- **In scope:** 
-- **Do not touch:** 
 
-## Spec / Reference
-<!-- Link to Notion spec, design file, or paste a brief description. -->
+<!-- Language, framework, libraries to use or avoid -->
 
+## Reference
 
-## Out of Scope
-<!-- Explicitly list what this issue does NOT cover. -->
-
-
-## Agent Notes
-<!-- Anything the agent needs to know: env vars, API quirks, known gotchas. -->
+<!-- Links to designs, Notion specs, related issues -->

@@ -1,43 +1,40 @@
-# Copilot Agent Instructions
+# Copilot Agent Instructions — TylrDn/CODE
 
-> Auto-loaded for every Copilot session in this repo. No paste required.
-> Source of truth: https://github.com/TylrDn/CODE
+This file is auto-loaded by GitHub Copilot in every session. No manual pasting required.
 
 ## Identity
 
-You are operating inside the **CODE swarm governance layer**. Every action must align with the standards in this file and the linked documents below.
+You are a coding agent operating inside the TylrDn swarm system. This repo (`CODE`) is the governance layer. All active repos are registered in `repo-index/`. All conventions are in `agent/`.
 
-## Governance Docs
+## Session Startup (always do this first)
 
-| Doc | Path | Purpose |
-|-----|------|---------|
-| Commit conventions | `agent/commit-conventions.md` | Conventional Commits spec |
-| Review protocol | `agent/review-protocol.md` | PR review criteria |
-| Repo index schema | `repo-index/_template.md` | Per-repo agent context |
+1. Read `repo-index/<current-repo>.md` if working in a downstream repo — or `repo-index/README.md` if in CODE itself
+2. Read `agent/commit-conventions.md`
+3. Read `agent/review-protocol.md`
+4. Confirm your working branch. Never commit directly to `main`.
 
-## Non-Negotiable Rules
+## Hard Rules
 
-1. **PR-only workflow** — never push directly to `main`. All work goes through a branch + PR.
-2. **Conventional Commits** — follow `agent/commit-conventions.md` exactly. No freeform messages.
-3. **Branch naming** — `feat/<slug>`, `fix/<slug>`, `chore/<slug>`, `exp/<slug>` (experiments).
-4. **One concern per PR** — do not mix features, fixes, and refactors in a single PR.
-5. **Read the repo index first** — before writing any code, read `repo-index/<this-repo>.md` if it exists. It defines stack, entry points, agent scope, and do-not-touch paths.
-6. **Write tests for logic** — any non-trivial function gets a test. No untested business logic in PRs.
-7. **No secrets in code** — use environment variables. Never hardcode tokens, keys, or credentials.
-8. **Scope discipline** — if a task is ambiguous, ask before implementing. Do not gold-plate.
+- **Branch first.** Always create a feature branch before any changes: `feat/<scope>`, `fix/<scope>`, `chore/<scope>`
+- **PR only.** All work lands via Pull Request. No direct pushes to `main`.
+- **Conventional Commits.** Every commit message follows `type(scope): description` — see `agent/commit-conventions.md`
+- **Do not touch files listed as off-limits** in the repo-index entry for this repo
+- **One concern per PR.** Don't bundle unrelated changes.
+- **Ask before deleting.** Never remove files or directories without explicit instruction.
 
-## Session Start Checklist
+## Spec-Driven Development
 
-- [ ] Read `repo-index/<this-repo>.md` for stack + scope constraints
-- [ ] Check open issues labeled `copilot` for queued tasks
-- [ ] Confirm branch does not already exist before creating
-- [ ] Confirm CI passes on `main` before branching
+If an issue exists for the task, read it fully before writing any code. The issue is the spec. If acceptance criteria are missing, ask before proceeding. If you discover scope beyond the issue, open a new issue — don't expand the current PR.
 
-## Spec-to-PR Pipeline
+## PR Checklist (before marking ready for review)
 
-When assigned to an issue:
-1. Read the issue — acceptance criteria are your definition of done
-2. Create branch: `feat/<issue-slug>` or `fix/<issue-slug>`
-3. Implement to spec — nothing beyond the acceptance criteria
-4. Open PR referencing the issue (`Closes #N`)
-5. Ensure CI passes before requesting review
+- [ ] Branch name matches `type/scope` convention
+- [ ] All commits follow Conventional Commits
+- [ ] PR description includes: What changed, Why, How to test
+- [ ] No unrelated files touched
+- [ ] Existing tests pass (or new tests added for new behavior)
+- [ ] `CODEOWNERS` will auto-request review from @TylrDn
+
+## Repo Index Location
+
+`TylrDn/CODE/repo-index/` — one `.md` file per registered repo. Read the relevant file at session start.

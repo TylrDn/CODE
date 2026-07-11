@@ -1,4 +1,4 @@
-# Reusable CI workflow for CODE swarm repos
+# Reusable CI workflow for TylrDn swarm repos
 # Usage in downstream repo:
 #   jobs:
 #     ci:
@@ -17,16 +17,15 @@ on:
         default: '20'
         type: string
       run-lint:
-        description: 'Run lint step'
+        description: 'Run ESLint'
         required: false
         default: true
         type: boolean
       run-test:
-        description: 'Run test step'
+        description: 'Run tests'
         required: false
         default: true
         type: boolean
-
   pull_request:
     branches: [main]
 
@@ -49,10 +48,12 @@ jobs:
       - name: Lint
         if: ${{ inputs.run-lint != false }}
         run: npm run lint --if-present
+        continue-on-error: false
 
       - name: Test
         if: ${{ inputs.run-test != false }}
         run: npm test --if-present
+        continue-on-error: false
 
   session-log:
     name: Auto Session Log
@@ -61,40 +62,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate session log entry
+      - name: Write session log
         run: |
           DATE=$(date +%Y-%m-%d)
           BRANCH="${{ github.event.pull_request.head.ref }}"
           PR_NUM="${{ github.event.pull_request.number }}"
           PR_TITLE="${{ github.event.pull_request.title }}"
-          PR_URL="${{ github.event.pull_request.html_url }}"
-          AUTHOR="${{ github.event.pull_request.user.login }}"
-          COMMITS=$(git log --oneline ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }} 2>/dev/null | head -20)
-
+          LOG_FILE="session-log/${DATE}-${BRANCH}.md"
           mkdir -p session-log
-          LOG_FILE="session-log/${DATE}-${BRANCH//\//-}.md"
-
-          cat > "$LOG_FILE" << EOF
-          # Session Log: ${PR_TITLE}
-
-          - **Date**: ${DATE}
-          - **Branch**: ${BRANCH}
-          - **PR**: [#${PR_NUM}](${PR_URL})
-          - **Author**: ${AUTHOR}
-
-          ## Commits
-          \`\`\`
-          ${COMMITS}
-          \`\`\`
-
-          ## Notes
-          <!-- Auto-generated on merge. Add context here if needed. -->
-          EOF
-
+          echo "# Session Log: ${DATE} — ${BRANCH}" > "$LOG_FILE"
+          echo "" >> "$LOG_FILE"
+          echo "**PR:** [#${PR_NUM}](https://github.com/${{ github.repository }}/pull/${PR_NUM}) — ${PR_TITLE}" >> "$LOG_FILE"
+          echo "**Merged:** ${DATE}" >> "$LOG_FILE"
+          echo "" >> "$LOG_FILE"
+          echo "## Commits" >> "$LOG_FILE"
+          git log origin/main..HEAD --oneline --no-merges | head -20 >> "$LOG_FILE" || true
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add "$LOG_FILE"
-          git diff --staged --quiet || git commit -m "chore(session-log): auto-log ${PR_TITLE} [skip ci]"
+          git diff --cached --quiet || git commit -m "chore(session-log): auto-log for ${BRANCH} [skip ci]"
           git push

@@ -1,66 +1,78 @@
-# Swarm Re-Entry Prompt
+# Swarm Launch Prompt
 
-Use this prompt to start or resume a Copilot agent session in any repo.
-Copy the block below, fill in the bracketed fields, and paste as your first message.
+Copy this prompt verbatim to start a Copilot agent session on any registered repo.
 
 ---
 
-## Prompt Template
+## Cold-Start Prompt (use this in any new Copilot session)
 
 ```
 You are a coding agent in the TylrDn swarm.
 
-Governance repo: https://github.com/TylrDn/CODE
-This session's repo: https://github.com/TylrDn/[REPO-NAME]
-
-Before writing any code:
-1. Read .github/copilot-instructions.md in THIS repo (auto-loaded if present)
+Before doing anything else:
+1. Read https://raw.githubusercontent.com/TylrDn/CODE/main/repo-index/<REPO-NAME>.md
+   (replace <REPO-NAME> with the repo you're working in — or CODE if working here)
 2. Read https://raw.githubusercontent.com/TylrDn/CODE/main/agent/commit-conventions.md
 3. Read https://raw.githubusercontent.com/TylrDn/CODE/main/agent/review-protocol.md
-4. Read https://raw.githubusercontent.com/TylrDn/CODE/main/repo-index/[REPO-NAME].md
-   (if it exists — skip if this is a new repo not yet registered)
 
-Session goal:
-[DESCRIBE WHAT YOU WANT BUILT / FIXED IN ONE PARAGRAPH]
+Then confirm:
+- Which repo you're in
+- Your current branch (create a feature branch if on main)
+- What task you're about to start
 
-Acceptance criteria:
-- [ ] [CRITERION 1]
-- [ ] [CRITERION 2]
-- [ ] [CRITERION 3]
+Hard rules:
+- Never commit directly to main
+- All changes go through a PR
+- Every commit uses Conventional Commits format
+- Scope your work to the agent-scope listed in the repo-index
+- Do not touch anything listed under "Do not touch"
+- One concern per PR — open a new issue for anything out of scope
 
-Constraints:
-- Work only in: [LIST DIRECTORIES OR FILES IN SCOPE]
-- Do not touch: [LIST FILES TO LEAVE ALONE]
-- Stack: [LANGUAGE / FRAMEWORK / KEY DEPS]
-
-When done: open a PR with a clear title following Conventional Commits.
-Do not merge — I will review.
+Wait for my task instruction.
 ```
 
 ---
 
-## Quick-Start Variant (for new ideas)
+## Quick-Start Prompt (when .github/copilot-instructions.md is already in the repo)
 
-Use this when you have an idea but no spec yet:
+If the target repo already has `.github/copilot-instructions.md` committed, Copilot loads it automatically. You can use this shorter prompt:
 
 ```
-You are a coding agent in the TylrDn swarm.
-Governance: https://github.com/TylrDn/CODE
+You are a coding agent in the TylrDn swarm. Read your instructions from .github/copilot-instructions.md, then read repo-index/<REPO-NAME>.md from TylrDn/CODE. Confirm your setup and wait for my task.
+```
 
-I want to build: [ONE SENTENCE IDEA]
+---
+
+## New Idea Prompt (spec → issue → PR pipeline)
+
+Use this when you want to go from idea to running code with minimal friction:
+
+```
+I have a new idea for <REPO-NAME>:
+
+<describe the idea in 2-3 sentences>
 
 Please:
-1. Read the governance docs (commit-conventions.md, review-protocol.md)
-2. Create a GitHub Issue in [REPO] using the experiment template
-3. Propose a minimal implementation plan (files to create/modify, no code yet)
-4. Wait for my approval before writing any code
+1. Create a GitHub Issue in TylrDn/<REPO-NAME> using the experiment or feature template
+2. Fill in the spec fields based on my description — ask me if anything is ambiguous
+3. Once I confirm the issue, create a feature branch and begin implementation
+4. Open a PR when done with a clear description of what was built and how to test it
+
+Follow all conventions from TylrDn/CODE.
 ```
 
 ---
 
-## Tips
+## Swarm Multi-Repo Prompt (parallel work across repos)
 
-- **Always name the repo explicitly.** Copilot can drift to the wrong context without it.
-- **Acceptance criteria = your review checklist.** Write them so you can verify each one by eye or test.
-- **"Do not touch" is as important as "in scope".** Protect generated files, env configs, and platform-specific dirs.
-- **One session = one PR.** If the scope expands mid-session, open a second issue rather than growing the PR.
+```
+I want to run parallel agent tasks across multiple repos.
+
+For each task below, create a GitHub Issue in the appropriate repo, then assign Copilot to it:
+
+1. Repo: TylrDn/<REPO-1> — Task: <description>
+2. Repo: TylrDn/<REPO-2> — Task: <description>
+3. Repo: TylrDn/<REPO-3> — Task: <description>
+
+Use the feature or experiment issue template. Fill in acceptance criteria based on the task description. Follow all conventions from TylrDn/CODE. Report back with issue URLs for each.
+```

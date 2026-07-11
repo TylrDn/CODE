@@ -1,63 +1,45 @@
-# repo-index: <repo-name>
+# Repo Index: <repo-name>
 
-> Copy this file to `<repo-name>.md` and fill in every field.
-> Copilot reads this at session start. Be precise — vague entries waste agent cycles.
+## <repo-name>
 
-## Identity
+- **Owner:** TylrDn
+- **Stack:** <!-- e.g., React Native / Expo / TypeScript -->
+- **Status:** active <!-- active | maintenance | archived | experimental -->
+- **Entry point:** <!-- e.g., App.tsx, src/index.ts, main.py -->
+- **Agent scope:** <!-- e.g., src/, components/, lib/ -->
+- **Do not touch:** <!-- e.g., ios/, android/, dist/, generated/ -->
+- **Linked specs:** <!-- Notion URL, GitHub Project, or issue tracker link -->
+- **Notes:** <!-- Anything the agent must know before starting: auth setup, env vars, quirks -->
 
-- **Repo**: `TylrDn/<repo-name>`
-- **Stack**: <!-- e.g. Next.js 14 / TypeScript / Tailwind / Supabase -->
-- **Status**: <!-- active | maintenance | archived | experimental -->
-- **Owner**: TylrDn
+## Branch Strategy
 
-## Entry Points
+- Default branch: `main`
+- Feature branches: `feat/<scope>`
+- Fix branches: `fix/<scope>`
+- All work via PR — no direct pushes to `main`
 
-- **App root**: <!-- e.g. `src/app/` or `App.tsx` -->
-- **API root**: <!-- e.g. `src/app/api/` or `server/routes/` -->
-- **Config**: <!-- e.g. `next.config.ts`, `.env.example` -->
-- **Tests**: <!-- e.g. `__tests__/`, `*.test.ts` -->
+## Key Commands
 
-## Agent Scope
+```bash
+# Install
+npm install  # or: pip install -r requirements.txt / etc.
 
-### ✅ Safe to modify
-```
-# List directories/files the agent is allowed to touch
-src/
-components/
-lib/
-```
+# Dev
+npm run dev
 
-### 🚫 Do not touch
-```
-# List generated, vendor, or protected paths
-node_modules/
-.next/
-ios/
-android/
-prisma/migrations/  # migration files only — schema changes via new migration
+# Test
+npm test
+
+# Lint
+npm run lint
 ```
 
-## Key Conventions
+## Environment Variables
 
-- <!-- e.g. "Use server components by default; client components only when hooks are needed" -->
-- <!-- e.g. "All DB queries go through `lib/db/` — no raw SQL in components" -->
-- <!-- e.g. "Tailwind utility classes only — no custom CSS files" -->
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `EXAMPLE_KEY` | What it does | Yes |
 
-## Environment
+## Related Repos
 
-```
-# Required env vars (no values — just keys)
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-```
-
-## Linked Specs
-
-- Notion: <!-- https://notion.so/... -->
-- Figma: <!-- https://figma.com/... -->
-- Open issues: <!-- https://github.com/TylrDn/<repo>/issues?q=label:copilot -->
-
-## Notes
-
-<!-- Anything else the agent should know before starting work -->
+<!-- List repos this one depends on or integrates with -->
