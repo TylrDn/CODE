@@ -1,9 +1,5 @@
 # Copilot Instructions — {{REPO_NAME}}
 
-> Copy this file to `.github/copilot-instructions.md` in any new repo to immediately inherit TylrDn governance conventions.
-
----
-
 <!--
   USAGE:
   1. Copy this file to .github/copilot-instructions.md in your target repo.

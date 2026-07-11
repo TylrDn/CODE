@@ -45,7 +45,7 @@ OUTPUT="${TEMPLATE_CONTENT//\{\{REPO_NAME\}\}/$REPO_NAME}"
 OUTPUT="$(echo "$OUTPUT" | awk '
   /^<!--/{skip=1}
   !skip{print}
-  /^-->/{skip=0}
+  /^-->/{skip=0; next}
 ')"
 
 # ── Write output ─────────────────────────────────────────────────────────────
