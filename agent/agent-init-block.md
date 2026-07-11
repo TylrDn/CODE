@@ -1,4 +1,5 @@
 # Agent Init Block
+<!-- last_reviewed: 2026-07-11 -->
 
 > **This is for starting an agent chat session** — not for setting up a new repo.
 > To bootstrap a new repo, see [`agent/copilot-instructions-template.md`](copilot-instructions-template.md) or run `bootstrap.sh`.

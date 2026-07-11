@@ -1,4 +1,5 @@
 # Copilot Instructions — {{REPO_NAME}}
+<!-- last_reviewed: 2026-07-11 -->
 
 <!--
   USAGE:
