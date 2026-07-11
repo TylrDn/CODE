@@ -1,4 +1,4 @@
-name: Auto Session Log
+name: Session Log
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 jobs:
-  generate-session-log:
+  log-session:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
@@ -14,35 +14,33 @@ jobs:
       pull-requests: read
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: main
 
       - name: Generate session log
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_TITLE: ${{ github.event.pull_request.title }}
-          PR_BODY: ${{ github.event.pull_request.body }}
           PR_BRANCH: ${{ github.event.pull_request.head.ref }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_BODY: ${{ github.event.pull_request.body }}
           PR_MERGED_AT: ${{ github.event.pull_request.merged_at }}
-          REPO: ${{ github.repository }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           DATE=$(echo "$PR_MERGED_AT" | cut -c1-10)
-          SLUG=$(echo "$PR_BRANCH" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-60)
-          FILENAME="session-log/${DATE}-${SLUG}.md"
-
+          SLUG=$(echo "$PR_BRANCH" | sed 's/[^a-zA-Z0-9]/-/g')
+          FILE="session-log/${DATE}-${SLUG}.md"
           mkdir -p session-log
 
-          cat > "$FILENAME" << EOF
+          cat > "$FILE" << EOF
           # Session Log: ${PR_TITLE}
 
-          - **Date:** ${DATE}
-          - **PR:** #${PR_NUMBER}
-          - **Branch:** ${PR_BRANCH}
-          - **Author:** ${PR_AUTHOR}
-          - **Repo:** ${REPO}
+          - **PR**: [#${PR_NUMBER}](${PR_URL})
+          - **Branch**: \`${PR_BRANCH}\`
+          - **Author**: ${PR_AUTHOR}
+          - **Merged**: ${PR_MERGED_AT}
 
           ## Summary
 
@@ -50,15 +48,13 @@ jobs:
 
           ## Commits
 
-          $(git log origin/main..HEAD --oneline 2>/dev/null || echo '_Commits not available_')
+          \`\`\`
+          $(git log --oneline origin/main~1..origin/main)
+          \`\`\`
           EOF
 
-          echo "FILENAME=$FILENAME" >> $GITHUB_ENV
-
-      - name: Commit session log
-        run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add "$FILENAME"
-          git diff --cached --quiet || git commit -m "chore(session-log): auto-log PR #${{ github.event.pull_request.number }}"
+          git add "$FILE"
+          git commit -m "chore(session-log): add log for PR #${PR_NUMBER}" || echo "No changes to commit"
           git push
