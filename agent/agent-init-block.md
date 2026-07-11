@@ -1,6 +1,9 @@
 # Agent Init Block
 
-> Paste this block at the start of any GitHub Copilot or Codex session to establish consistent context.
+> **This is for starting an agent chat session** — not for setting up a new repo.
+> To bootstrap a new repo, see [`agent/copilot-instructions-template.md`](copilot-instructions-template.md) or run `bootstrap.sh`.
+
+Paste this block at the start of any GitHub Copilot or Codex session to establish consistent context.
 
 ---
 

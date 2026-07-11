@@ -1,4 +1,4 @@
-# Copilot Instructions Template
+# Copilot Instructions — {{REPO_NAME}}
 
 > Copy this file to `.github/copilot-instructions.md` in any new repo to immediately inherit TylrDn governance conventions.
 
@@ -8,12 +8,13 @@
   USAGE:
   1. Copy this file to .github/copilot-instructions.md in your target repo.
   2. Replace {{REPO_NAME}} with your repository name (e.g. TylrDn/mobile-forge).
+     Or run bootstrap.sh to do this automatically.
   3. Remove this comment block.
 -->
 
 ## Governance
 
-This repository is part of the **TylrDn** account.
+This repository (**{{REPO_NAME}}**) is part of the **TylrDn** account.
 All conventions, agent workflow standards, and architecture decisions are maintained in the central governance repo:
 
 > 📐 **[TylrDn/CODE](https://github.com/TylrDn/CODE)** — source of truth for all TylrDn repos
