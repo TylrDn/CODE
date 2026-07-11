@@ -1,40 +1,41 @@
 # Copilot Agent Instructions — TylrDn/CODE
 
-> This file is auto-loaded by GitHub Copilot in every session. No pasting required.
-> For per-repo instructions, copy `agent/copilot-instructions-template.md` into that repo's `.github/copilot-instructions.md` and fill in the blanks.
+> This file is auto-loaded by GitHub Copilot in every session. No manual pasting required.
 
 ## Identity
+You are operating inside the `TylrDn/CODE` swarm governance repo. Your job is to help maintain, extend, and apply the standards defined here across all registered repos.
 
-You are operating inside the `TylrDn/CODE` governance repo — the source of truth for conventions, agent behaviour, and registered project registry. This repo does not ship product code; it ships infrastructure for other repos.
-
-## Mandatory Workflow
-
-1. **Never commit directly to `main`.** All changes go through a PR.
-2. Branch naming: `feat/`, `fix/`, `chore/`, `docs/` prefixes + kebab-case description.
-3. Follow commit conventions in `agent/commit-conventions.md` exactly.
-4. Before opening a PR, self-review against `agent/review-protocol.md`.
-5. After merge, update `session-log/` with what changed and why.
+## Core Rules
+- **Never push directly to `main`** — all work goes through a PR from a feature branch
+- Branch naming: `feat/`, `fix/`, `chore/`, `experiment/` prefixes
+- Commits follow Conventional Commits (see `agent/commit-conventions.md`)
+- Every PR must pass the review checklist in `agent/review-protocol.md`
+- Read `repo-index/` before working in any registered repo — it defines scope and do-not-touch zones
 
 ## Repo Index
+All registered repos are documented in `repo-index/`. Each file has:
+- Stack and entry point
+- Agent scope (what you may edit)
+- Off-limits paths
+- Linked specs
 
-All registered repos live in `repo-index/`. Before working in any downstream repo, read its index file first. It defines stack, entry points, agent scope, and no-touch zones.
+## Issue → PR Workflow
+1. Issues are created with a structured spec template (`.github/ISSUE_TEMPLATE/`)
+2. Assign Copilot to the issue
+3. Copilot opens a branch + PR scoped to the spec
+4. PR is reviewed against `agent/review-protocol.md`
+5. On merge, session log is auto-created via the workflow
 
-## Key Files
+## Reusable CI
+Downstream repos can inherit CI via:
+```yaml
+jobs:
+  ci:
+    uses: TylrDn/CODE/.github/workflows/ci-reusable.yml@main
+```
 
-| File | Purpose |
-|---|---|
-| `agent/agent-init-block.md` | Paste-in prompt for ad-hoc Copilot sessions |
-| `agent/copilot-instructions-template.md` | Template to drop into any new repo |
-| `agent/commit-conventions.md` | Conventional Commits spec + examples |
-| `agent/review-protocol.md` | PR self-review checklist |
-| `repo-index/` | One `.md` per registered repo |
-| `session-log/` | Chronological log of agent sessions |
-| `bootstrap.sh` | Bootstraps a new repo with CODE conventions |
-
-## Rules
-
-- Do not modify files outside your declared scope without explicit instruction.
-- Do not create files not described in a spec or issue.
-- If a spec is ambiguous, open a comment on the issue — do not guess.
-- Prefer small, focused PRs over large ones.
-- Every PR description must include: what changed, why, and how to verify.
+## Session Start Checklist
+- [ ] Read `repo-index/<target-repo>.md` if working in a specific repo
+- [ ] Check open issues/PRs for context
+- [ ] Confirm branch convention before first commit
+- [ ] Never modify files outside declared agent scope

@@ -1,22 +1,36 @@
-# repo-index template
-# Copy to repo-index/<repo-name>.md and fill in for each registered repo.
-# This file is read by Copilot at session start to eliminate cold-start exploration.
+# Repo: <repo-name>
 
-## <repo-name>
+## Meta
+- **GitHub:** https://github.com/TylrDn/<repo-name>
+- **Status:** active | paused | archived
+- **Last updated:** YYYY-MM-DD
 
-- **Repo**: https://github.com/TylrDn/<repo-name>
-- **Stack**: <!-- e.g. Next.js 14, TypeScript, Tailwind, Supabase -->
-- **Status**: <!-- active | paused | archived -->
-- **Primary entry point**: <!-- e.g. src/app/page.tsx or App.tsx -->
-- **Agent scope**: <!-- directories Copilot is allowed to modify -->
-  - `src/`
-  - `components/`
-- **Do not touch**:
-  - <!-- e.g. ios/, android/, generated/, prisma/migrations/ -->
-- **Key conventions**:
-  - <!-- e.g. all API calls go through src/lib/api.ts -->
-  - <!-- e.g. state managed with Zustand, no Redux -->
-- **Linked specs**: <!-- Notion URLs, Figma links -->
-- **CI**: <!-- link to workflow or 'uses TylrDn/CODE/.github/workflows/agent-ci.yml@main' -->
-- **Last active**: <!-- YYYY-MM-DD -->
-- **Notes**: <!-- anything an agent needs to know before starting -->
+## Stack
+- **Language:** 
+- **Framework:** 
+- **Key dependencies:** 
+- **Package manager:** npm | yarn | pnpm | pip | cargo
+
+## Entry Points
+- **Main:** 
+- **Config:** 
+- **Tests:** 
+
+## Agent Scope
+<!-- What the Copilot agent IS allowed to modify -->
+- `src/`
+- `tests/`
+- `docs/`
+
+## Do Not Touch
+<!-- Paths the agent must never modify without explicit instruction -->
+- `dist/` — generated build output
+- `.env*` — secrets
+- _(add repo-specific paths)_
+
+## Linked Specs
+<!-- Notion pages, PRDs, design docs -->
+- 
+
+## Notes
+<!-- Anything the agent needs to know: quirks, gotchas, deploy flow -->

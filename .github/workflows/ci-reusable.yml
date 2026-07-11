@@ -1,0 +1,79 @@
+# Reusable CI workflow — callable from any downstream repo
+# Usage in downstream repo:
+#   jobs:
+#     ci:
+#       uses: TylrDn/CODE/.github/workflows/ci-reusable.yml@main
+#       with:
+#         node-version: '20'
+
+name: Reusable CI
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Node.js version'
+        required: false
+        default: '20'
+        type: string
+      python-version:
+        description: 'Python version (set to skip Node setup)'
+        required: false
+        default: ''
+        type: string
+      run-lint:
+        description: 'Run lint step'
+        required: false
+        default: true
+        type: boolean
+      run-test:
+        description: 'Run test step'
+        required: false
+        default: true
+        type: boolean
+      lint-command:
+        description: 'Lint command override'
+        required: false
+        default: 'npm run lint'
+        type: string
+      test-command:
+        description: 'Test command override'
+        required: false
+        default: 'npm test'
+        type: string
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        if: inputs.python-version == ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+
+      - name: Setup Python
+        if: inputs.python-version != ''
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install dependencies (Node)
+        if: inputs.python-version == ''
+        run: npm ci
+
+      - name: Install dependencies (Python)
+        if: inputs.python-version != ''
+        run: pip install -r requirements.txt
+
+      - name: Lint
+        if: inputs.run-lint
+        run: ${{ inputs.lint-command }}
+
+      - name: Test
+        if: inputs.run-test
+        run: ${{ inputs.test-command }}

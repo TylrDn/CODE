@@ -1,7 +1,7 @@
-# Auto-generates a session log entry when a PR is merged into main.
-# Creates session-log/YYYY-MM-DD-<branch>.md with commit history.
+# Auto-creates a session log entry when a PR is merged
+# Log is committed to session-log/YYYY-MM-DD-<branch>.md
 
-name: Session Log
+name: Session Log on Merge
 
 on:
   pull_request:
@@ -14,37 +14,42 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate session log entry
+      - name: Generate session log
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          MERGED_AT: ${{ github.event.pull_request.merged_at }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
-          DATE=$(date +%Y-%m-%d)
-          BRANCH="${{ github.event.pull_request.head.ref }}"
-          SLUG=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9]/-/g')
-          FILE="session-log/${DATE}-${SLUG}.md"
+          DATE=$(echo "$MERGED_AT" | cut -c1-10)
+          SAFE_BRANCH=$(echo "$BRANCH" | tr '/' '-')
+          FILENAME="session-log/${DATE}-${SAFE_BRANCH}.md"
+          mkdir -p session-log
+          cat > "$FILENAME" << EOF
+          # Session Log: ${PR_TITLE}
 
-          echo "# Session: ${BRANCH}" > $FILE
-          echo "" >> $FILE
-          echo "**Date:** ${DATE}" >> $FILE
-          echo "**PR:** #${{ github.event.pull_request.number }} — ${{ github.event.pull_request.title }}" >> $FILE
-          echo "**Author:** ${{ github.event.pull_request.user.login }}" >> $FILE
-          echo "" >> $FILE
-          echo "## Summary" >> $FILE
-          echo "" >> $FILE
-          echo "${{ github.event.pull_request.body }}" >> $FILE
-          echo "" >> $FILE
-          echo "## Commits" >> $FILE
-          echo "" >> $FILE
-          git log origin/main..${{ github.event.pull_request.merge_commit_sha }} \
-            --pretty=format:"- %s (%h)" >> $FILE || \
-          git log --oneline -20 --pretty=format:"- %s (%h)" >> $FILE
+          - **PR:** [#${PR_NUMBER}](${PR_URL})
+          - **Branch:** ${BRANCH}
+          - **Author:** ${AUTHOR}
+          - **Merged:** ${MERGED_AT}
 
+          ## Summary
+          ${PR_BODY}
+
+          ## Commits
+          $(git log --oneline origin/main..HEAD 2>/dev/null || echo 'See PR for commit list')
+          EOF
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add $FILE
-          git commit -m "chore(session-log): auto-log merge of ${BRANCH} [skip ci]"
+          git add "$FILENAME"
+          git commit -m "chore(session-log): auto-log PR #${PR_NUMBER} [skip ci]" || echo 'Nothing to commit'
           git push

@@ -1,41 +1,34 @@
 ---
-name: "✨ Feature Spec"
-about: "New feature built to spec — Copilot-ready"
+name: "Feature Spec"
+about: "New feature built to spec — ready for Copilot agent"
 title: "feat: "
-labels: ["feature", "copilot"]
-assignees: ""
+labels: ["copilot", "feature"]
+assignees: []
 ---
 
-## Summary
-
-<!-- One sentence: what is this and why does it matter? -->
-
 ## Problem
+<!-- What user or system problem does this solve? One paragraph max. -->
 
-<!-- What pain or gap does this address? -->
+## Proposed Solution
+<!-- What should be built? Be specific about behavior, not implementation. -->
 
 ## Acceptance Criteria
-
-- [ ] <!-- Criterion 1 — observable, testable -->
+- [ ] <!-- Criterion 1 -->
 - [ ] <!-- Criterion 2 -->
 - [ ] <!-- Criterion 3 -->
 
-## Spec
-
-<!-- Detailed description of behaviour, edge cases, data shapes, UI states -->
-
 ## Stack Constraints
+<!-- Language, framework, libraries to use or avoid -->
 
-- Repo: <!-- e.g. TylrDn/mobile-forge -->
-- Stack: <!-- e.g. React Native / Expo -->
-- Entry point: <!-- e.g. src/screens/HomeScreen.tsx -->
-- Do not touch: <!-- e.g. ios/, android/ -->
+## Scope
+**In scope:**
+- 
 
-## Out of Scope
+**Out of scope (do not touch):**
+- 
 
-<!-- Explicitly list what this issue does NOT cover -->
+## Linked Specs
+<!-- Notion page, PRD, design doc URLs -->
 
-## Links
-
-- Notion spec: <!-- notion://... -->
-- Related issues: <!-- # -->
+## Agent Notes
+<!-- Any extra context for the Copilot agent -->
