@@ -1,0 +1,163 @@
+name: Auto-merge Copilot PRs
+
+# Fires whenever a review is submitted on any PR, or when a check suite
+# completes. Merges automatically once every required AI reviewer has approved
+# and every status check is green.
+
+on:
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    name: Approve and merge if all AI reviews pass
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Find open Copilot PR for this SHA
+        id: find-pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # On check_suite events use head_sha; on review events use the PR
+          # number supplied by the event payload.
+          if [ "${{ github.event_name }}" = "pull_request_review" ]; then
+            PR_NUMBER=${{ github.event.pull_request.number }}
+          else
+            SHA="${{ github.event.check_suite.head_sha }}"
+            PR_NUMBER=$(gh pr list \
+              --repo "${{ github.repository }}" \
+              --state open \
+              --json number,headRefOid \
+              --jq ".[] | select(.headRefOid==\"$SHA\") | .number" \
+              | head -1)
+          fi
+
+          if [ -z "$PR_NUMBER" ]; then
+            echo "No open PR found — skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
+      - name: Check PR author is Copilot bot
+        if: steps.find-pr.outputs.skip == 'false'
+        id: check-author
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          AUTHOR=$(gh pr view "${{ steps.find-pr.outputs.pr_number }}" \
+            --repo "${{ github.repository }}" \
+            --json author \
+            --jq '.author.login')
+
+          echo "Author: $AUTHOR"
+
+          # Accept commits from Copilot bot or Copilot-named branches
+          HEAD_REF=$(gh pr view "${{ steps.find-pr.outputs.pr_number }}" \
+            --repo "${{ github.repository }}" \
+            --json headRefName \
+            --jq '.headRefName')
+
+          if echo "$AUTHOR" | grep -qiE 'copilot|github-actions'; then
+            echo "is_copilot=true" >> "$GITHUB_OUTPUT"
+          elif echo "$HEAD_REF" | grep -qiE '^copilot/'; then
+            echo "is_copilot=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_copilot=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check all reviews are approved (no changes requested)
+        if: steps.check-author.outputs.is_copilot == 'true'
+        id: check-reviews
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CHANGES_REQUESTED=$(gh pr view "${{ steps.find-pr.outputs.pr_number }}" \
+            --repo "${{ github.repository }}" \
+            --json reviews \
+            --jq '[.reviews[] | select(.state=="CHANGES_REQUESTED")] | length')
+
+          APPROVED=$(gh pr view "${{ steps.find-pr.outputs.pr_number }}" \
+            --repo "${{ github.repository }}" \
+            --json reviews \
+            --jq '[.reviews[] | select(.state=="APPROVED")] | length')
+
+          echo "Approved reviews: $APPROVED"
+          echo "Changes requested: $CHANGES_REQUESTED"
+
+          if [ "$CHANGES_REQUESTED" -gt 0 ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "reason=changes_requested" >> "$GITHUB_OUTPUT"
+          elif [ "$APPROVED" -lt 1 ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "reason=no_approvals" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check all status checks passed
+        if: steps.check-reviews.outputs.ready == 'true'
+        id: check-status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Exclude this workflow's own check to avoid circular dependency
+          FAILING=$(gh pr view "${{ steps.find-pr.outputs.pr_number }}" \
+            --repo "${{ github.repository }}" \
+            --json statusCheckRollup \
+            --jq '[.statusCheckRollup[] |
+                   select(.conclusion != null and
+                          .conclusion != "SUCCESS" and
+                          .conclusion != "SKIPPED" and
+                          .conclusion != "NEUTRAL" and
+                          .name != "auto-merge")] | length')
+
+          PENDING=$(gh pr view "${{ steps.find-pr.outputs.pr_number }}" \
+            --repo "${{ github.repository }}" \
+            --json statusCheckRollup \
+            --jq '[.statusCheckRollup[] |
+                   select(.conclusion == null and
+                          .name != "auto-merge")] | length')
+
+          echo "Failing checks: $FAILING"
+          echo "Pending checks: $PENDING"
+
+          if [ "$PENDING" -gt 0 ]; then
+            echo "checks_ok=false" >> "$GITHUB_OUTPUT"
+            echo "reason=checks_pending" >> "$GITHUB_OUTPUT"
+          elif [ "$FAILING" -gt 0 ]; then
+            echo "checks_ok=false" >> "$GITHUB_OUTPUT"
+            echo "reason=checks_failing" >> "$GITHUB_OUTPUT"
+          else
+            echo "checks_ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Approve PR
+        if: steps.check-status.outputs.checks_ok == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr review "${{ steps.find-pr.outputs.pr_number }}" \
+            --repo "${{ github.repository }}" \
+            --approve \
+            --body "✅ All AI reviews approved and status checks passed. Auto-merging."
+
+      - name: Enable auto-merge
+        if: steps.check-status.outputs.checks_ok == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr merge "${{ steps.find-pr.outputs.pr_number }}" \
+            --repo "${{ github.repository }}" \
+            --squash \
+            --auto \
+            --delete-branch
