@@ -1,0 +1,60 @@
+name: "✨ Feature Spec"
+description: "Structured spec for a new feature — ready for Copilot agent assignment"
+title: "feat: "
+labels: ["feature", "copilot"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill this out completely before assigning to Copilot. Vague specs produce vague PRs.
+
+  - type: input
+    id: summary
+    attributes:
+      label: "One-line summary"
+      description: "What does this feature do, in plain English?"
+      placeholder: "Add dark mode toggle to the settings page"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Problem / motivation"
+      description: "What user need or gap does this address?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: "Acceptance criteria"
+      description: "Bullet list of testable conditions. Each line = one verifiable outcome."
+      placeholder: |
+        - [ ] Toggle is visible in Settings > Appearance
+        - [ ] State persists across sessions
+        - [ ] All text meets WCAG AA contrast in both modes
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: "In scope / Out of scope"
+      placeholder: |
+        In scope: settings UI, theme CSS variables
+        Out of scope: email preferences, mobile app
+    validations:
+      required: true
+
+  - type: input
+    id: stack
+    attributes:
+      label: "Stack / files likely touched"
+      placeholder: "React, src/settings/, src/styles/theme.css"
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: "Additional notes / references"
+      description: "Notion spec link, Figma link, prior art, or constraints"

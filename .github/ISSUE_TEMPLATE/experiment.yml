@@ -1,0 +1,51 @@
+name: "🧪 Experiment"
+description: "A time-boxed spike or proof-of-concept — no production commitment"
+title: "exp: "
+labels: ["experiment", "copilot"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Experiments are time-boxed explorations. Output is a PR with findings, not necessarily shippable code.
+
+  - type: input
+    id: hypothesis
+    attributes:
+      label: "Hypothesis"
+      description: "What are you trying to learn or validate?"
+      placeholder: "Can we use edge functions to cut auth latency below 50ms?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: approach
+    attributes:
+      label: "Approach"
+      description: "What will Copilot build or try?"
+    validations:
+      required: true
+
+  - type: input
+    id: timebox
+    attributes:
+      label: "Time-box"
+      placeholder: "2 hours / 1 day / 1 sprint"
+    validations:
+      required: true
+
+  - type: textarea
+    id: done
+    attributes:
+      label: "Definition of done"
+      description: "What does the PR need to include to close this issue?"
+      placeholder: |
+        - [ ] Working prototype or minimal reproduction
+        - [ ] README section: what worked, what didn't, recommendation
+    validations:
+      required: true
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: "Constraints / do not touch"
+      placeholder: "Do not modify production DB schema. Experiment in /sandbox only."

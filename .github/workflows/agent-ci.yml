@@ -1,0 +1,100 @@
+# Reusable CI workflow for CODE swarm repos
+# Usage in downstream repo:
+#   jobs:
+#     ci:
+#       uses: TylrDn/CODE/.github/workflows/agent-ci.yml@main
+#       with:
+#         node-version: '20'
+
+name: Agent CI
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Node.js version'
+        required: false
+        default: '20'
+        type: string
+      run-lint:
+        description: 'Run lint step'
+        required: false
+        default: true
+        type: boolean
+      run-test:
+        description: 'Run test step'
+        required: false
+        default: true
+        type: boolean
+
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: Lint + Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version || '20' }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --if-present
+
+      - name: Lint
+        if: ${{ inputs.run-lint != false }}
+        run: npm run lint --if-present
+
+      - name: Test
+        if: ${{ inputs.run-test != false }}
+        run: npm test --if-present
+
+  session-log:
+    name: Auto Session Log
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate session log entry
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          BRANCH="${{ github.event.pull_request.head.ref }}"
+          PR_NUM="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          AUTHOR="${{ github.event.pull_request.user.login }}"
+          COMMITS=$(git log --oneline ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.merge_commit_sha }} 2>/dev/null | head -20)
+
+          mkdir -p session-log
+          LOG_FILE="session-log/${DATE}-${BRANCH//\//-}.md"
+
+          cat > "$LOG_FILE" << EOF
+          # Session Log: ${PR_TITLE}
+
+          - **Date**: ${DATE}
+          - **Branch**: ${BRANCH}
+          - **PR**: [#${PR_NUM}](${PR_URL})
+          - **Author**: ${AUTHOR}
+
+          ## Commits
+          \`\`\`
+          ${COMMITS}
+          \`\`\`
+
+          ## Notes
+          <!-- Auto-generated on merge. Add context here if needed. -->
+          EOF
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "$LOG_FILE"
+          git diff --staged --quiet || git commit -m "chore(session-log): auto-log ${PR_TITLE} [skip ci]"
+          git push
