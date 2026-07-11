@@ -1,0 +1,50 @@
+# Auto-generates a session log entry when a PR is merged into main.
+# Creates session-log/YYYY-MM-DD-<branch>.md with commit history.
+
+name: Session Log
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  log:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate session log entry
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          BRANCH="${{ github.event.pull_request.head.ref }}"
+          SLUG=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9]/-/g')
+          FILE="session-log/${DATE}-${SLUG}.md"
+
+          echo "# Session: ${BRANCH}" > $FILE
+          echo "" >> $FILE
+          echo "**Date:** ${DATE}" >> $FILE
+          echo "**PR:** #${{ github.event.pull_request.number }} — ${{ github.event.pull_request.title }}" >> $FILE
+          echo "**Author:** ${{ github.event.pull_request.user.login }}" >> $FILE
+          echo "" >> $FILE
+          echo "## Summary" >> $FILE
+          echo "" >> $FILE
+          echo "${{ github.event.pull_request.body }}" >> $FILE
+          echo "" >> $FILE
+          echo "## Commits" >> $FILE
+          echo "" >> $FILE
+          git log origin/main..${{ github.event.pull_request.merge_commit_sha }} \
+            --pretty=format:"- %s (%h)" >> $FILE || \
+          git log --oneline -20 --pretty=format:"- %s (%h)" >> $FILE
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add $FILE
+          git commit -m "chore(session-log): auto-log merge of ${BRANCH} [skip ci]"
+          git push

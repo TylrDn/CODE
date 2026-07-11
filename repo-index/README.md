@@ -1,9 +1,27 @@
 # Repo Index
 
-Registry of all active and planned repositories under the TylrDn account.
+One file per registered repo. Each file defines stack, entry points, agent scope, and no-touch zones.
+Copilot reads this before starting work in any downstream repo.
 
-| Repo | Status | Ruleset | Stack | Purpose |
-|------|--------|---------|-------|---------|
-| [CODE](https://github.com/TylrDn/CODE) | active | ✅ branch ruleset on `main` | Markdown / GitHub Actions | Central architecture, repo-index, session-log, agent instructions |
-| [mobile-forge](mobile-forge.md) | active | pending | TypeScript / React Native / Expo / GitHub Actions | Mobile-first project scaffold and CI/CD template |
-| [dev-kit](dev-kit.md) | active | pending | Zsh / VS Code / Git / Shell scripts | Developer environment dotfiles, tooling configs, agent workflow standards |
+## Schema
+
+```markdown
+## <repo-name>
+
+- **Repo:** TylrDn/<repo-name>
+- **Stack:** <language / framework / runtime>
+- **Status:** active | paused | archived
+- **Entry point:** <main file Copilot should start from>
+- **Agent scope:** <directories/files Copilot is allowed to modify>
+- **Do not touch:** <directories/files that are off-limits>
+- **Linked specs:** <Notion URL or issue links>
+- **Notes:** <anything else the agent needs to know>
+```
+
+## Registered Repos
+
+| Repo | Stack | Status |
+|---|---|---|
+| [CODE](CODE.md) | Markdown / Shell / GitHub Actions | active |
+
+Add a new `.md` file here when bootstrapping a new repo (`bootstrap.sh` does this automatically).

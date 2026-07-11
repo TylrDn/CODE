@@ -1,22 +1,10 @@
 ## CODE
 
-- **Repo**: https://github.com/TylrDn/CODE
-- **Stack**: Markdown, GitHub Actions, Bash
-- **Status**: active
-- **Primary entry point**: README.md
-- **Agent scope**:
-  - `agent/`
-  - `repo-index/`
-  - `session-log/`
-  - `.github/ISSUE_TEMPLATE/`
-  - `.github/workflows/`
-- **Do not touch**:
-  - `.github/copilot-instructions.md` (only update intentionally)
-- **Key conventions**:
-  - This repo IS the swarm governance layer — changes here affect all downstream repos
-  - All docs use plain Markdown, no frontmatter unless in YAML issue templates
-  - Commit messages: `docs:`, `feat:`, `chore:` only (no code, no tests)
-- **Linked specs**: N/A — this repo IS the spec
-- **CI**: `.github/workflows/agent-ci.yml` (self-referential, run on PRs to main)
-- **Last active**: 2026-07-11
-- **Notes**: When adding a new downstream repo, copy `repo-index/_template.md` → `repo-index/<repo-name>.md` and register it here.
+- **Repo:** TylrDn/CODE
+- **Stack:** Markdown / Shell / GitHub Actions
+- **Status:** active
+- **Entry point:** README.md
+- **Agent scope:** agent/, repo-index/, session-log/, .github/, bootstrap.sh
+- **Do not touch:** CODEOWNERS (edit manually only)
+- **Linked specs:** N/A — this repo IS the spec
+- **Notes:** This is the governance repo. Changes here propagate to all downstream repos via `bootstrap.sh` and the reusable CI workflow. Be conservative — any breaking change to `agent/copilot-instructions-template.md` or `bootstrap.sh` affects every registered repo.

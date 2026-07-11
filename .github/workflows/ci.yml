@@ -1,0 +1,59 @@
+# Reusable CI workflow — reference from downstream repos:
+# jobs:
+#   ci:
+#     uses: TylrDn/CODE/.github/workflows/ci.yml@main
+
+name: CI
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: "Node.js version"
+        required: false
+        default: "20"
+        type: string
+      run-lint:
+        description: "Run linter"
+        required: false
+        default: true
+        type: boolean
+      run-test:
+        description: "Run tests"
+        required: false
+        default: true
+        type: boolean
+      run-build:
+        description: "Run build"
+        required: false
+        default: true
+        type: boolean
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version || '20' }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        if: ${{ inputs.run-lint != false }}
+        run: npm run lint --if-present
+
+      - name: Test
+        if: ${{ inputs.run-test != false }}
+        run: npm test --if-present
+
+      - name: Build
+        if: ${{ inputs.run-build != false }}
+        run: npm run build --if-present
