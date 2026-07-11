@@ -4,7 +4,7 @@
 
 ## Purpose
 
-`dev-kit` centralises dotfiles, editor settings, git configuration, and agent workflow documents so that any machine or coding session can be bootstrapped to a consistent, productive state in one command.
+`dev-kit` centralizes dotfiles, editor settings, git configuration, and agent workflow documents so that any machine or coding session can be bootstrapped to a consistent, productive state in one command.
 
 ## Stack
 
