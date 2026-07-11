@@ -1,7 +1,4 @@
-# Auto-creates a session log entry when a PR is merged
-# Log is committed to session-log/YYYY-MM-DD-<branch>.md
-
-name: Session Log on Merge
+name: Auto Session Log
 
 on:
   pull_request:
@@ -9,47 +6,59 @@ on:
     branches: [main]
 
 jobs:
-  log:
+  generate-session-log:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: read
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Generate session log
         env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
-          BRANCH: ${{ github.event.pull_request.head.ref }}
-          AUTHOR: ${{ github.event.pull_request.user.login }}
-          MERGED_AT: ${{ github.event.pull_request.merged_at }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_MERGED_AT: ${{ github.event.pull_request.merged_at }}
+          REPO: ${{ github.repository }}
         run: |
-          DATE=$(echo "$MERGED_AT" | cut -c1-10)
-          SAFE_BRANCH=$(echo "$BRANCH" | tr '/' '-')
-          FILENAME="session-log/${DATE}-${SAFE_BRANCH}.md"
+          DATE=$(echo "$PR_MERGED_AT" | cut -c1-10)
+          SLUG=$(echo "$PR_BRANCH" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-60)
+          FILENAME="session-log/${DATE}-${SLUG}.md"
+
           mkdir -p session-log
+
           cat > "$FILENAME" << EOF
           # Session Log: ${PR_TITLE}
 
-          - **PR:** [#${PR_NUMBER}](${PR_URL})
-          - **Branch:** ${BRANCH}
-          - **Author:** ${AUTHOR}
-          - **Merged:** ${MERGED_AT}
+          - **Date:** ${DATE}
+          - **PR:** #${PR_NUMBER}
+          - **Branch:** ${PR_BRANCH}
+          - **Author:** ${PR_AUTHOR}
+          - **Repo:** ${REPO}
 
           ## Summary
+
           ${PR_BODY}
 
           ## Commits
-          $(git log --oneline origin/main..HEAD 2>/dev/null || echo 'See PR for commit list')
+
+          $(git log origin/main..HEAD --oneline 2>/dev/null || echo '_Commits not available_')
           EOF
+
+          echo "FILENAME=$FILENAME" >> $GITHUB_ENV
+
+      - name: Commit session log
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add "$FILENAME"
-          git commit -m "chore(session-log): auto-log PR #${PR_NUMBER} [skip ci]" || echo 'Nothing to commit'
+          git diff --cached --quiet || git commit -m "chore(session-log): auto-log PR #${{ github.event.pull_request.number }}"
           git push

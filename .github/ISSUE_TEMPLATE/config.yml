@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Repo Index
-    url: https://github.com/TylrDn/CODE/tree/main/repo-index
-    about: See all registered repos before filing an issue
+  - name: Swarm Governance Docs
+    url: https://github.com/TylrDn/CODE
+    about: Conventions, templates, and agent instructions for the TylrDn swarm.

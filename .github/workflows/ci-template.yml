@@ -1,0 +1,67 @@
+# Reusable CI workflow — reference from downstream repos:
+#
+#   jobs:
+#     ci:
+#       uses: TylrDn/CODE/.github/workflows/ci-template.yml@main
+#       with:
+#         node-version: '20'
+#
+# Override any input to customize per-repo.
+
+name: CI (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Node.js version'
+        required: false
+        default: '20'
+        type: string
+      run-lint:
+        description: 'Run ESLint'
+        required: false
+        default: true
+        type: boolean
+      run-typecheck:
+        description: 'Run TypeScript type check'
+        required: false
+        default: true
+        type: boolean
+      run-test:
+        description: 'Run test suite'
+        required: false
+        default: true
+        type: boolean
+      install-command:
+        description: 'Install command'
+        required: false
+        default: 'npm ci'
+        type: string
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: ${{ inputs.install-command }}
+
+      - name: Lint
+        if: ${{ inputs.run-lint }}
+        run: npm run lint --if-present
+
+      - name: Type check
+        if: ${{ inputs.run-typecheck }}
+        run: npm run typecheck --if-present
+
+      - name: Test
+        if: ${{ inputs.run-test }}
+        run: npm test --if-present
